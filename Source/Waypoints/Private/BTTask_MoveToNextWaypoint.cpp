@@ -25,6 +25,7 @@ UBTTask_MoveToNextWaypoint::UBTTask_MoveToNextWaypoint(const FObjectInitializer&
 	bReachTestIncludesGoalRadius = bReachTestIncludesAgentRadius = GET_AI_CONFIG_VAR(bFinishMoveOnGoalOverlap);
 	//bAllowStrafe = GET_AI_CONFIG_VAR(bAllowStrafing);
 
+	bSetNextWaypointAfterFinishing = true;
 	bWaitAtCheckpoint = true;
 
 	// Accept only waypoints
@@ -193,16 +194,16 @@ void UBTTask_MoveToNextWaypoint::OnTaskFinished(UBehaviorTreeComponent& OwnerCom
 	MyMemory->Task.Reset();
 
 	// Set the blackboard value to the next waypoint
-	//if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
-	//{
-	//	UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
-	//	UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-	//	AWaypoint* TargetActor = Cast<AWaypoint>(KeyValue);
-	//	if (TargetActor)
-	//	{
-	//		MyBlackboard->SetValueAsObject(BlackboardKey.SelectedKeyName, TargetActor->GetNextWaypoint());
-	//	}
-	//}
+	if (bSetNextWaypointAfterFinishing && BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
+	{
+		UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
+		UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
+
+		if (AWaypoint* TargetActor = Cast<AWaypoint>(KeyValue))
+		{
+			MyBlackboard->SetValueAsObject(BlackboardKey.SelectedKeyName, TargetActor->GetNextWaypoint());
+		}
+	}
 
 	// Reset the AI's focus
 	if (AAIController* MyController = OwnerComp.GetAIOwner())

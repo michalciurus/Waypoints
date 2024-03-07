@@ -103,7 +103,7 @@ AWaypoint::AWaypoint(const FObjectInitializer& ObjectInitializer)
 	}
 
 	bUseCharacterClassNavProperties = true;
-	CharacterClass = nullptr;
+	CharacterClass = ACharacter::StaticClass();
 }
 
 TArray<TWeakObjectPtr<AWaypoint>> AWaypoint::GetLoop() const

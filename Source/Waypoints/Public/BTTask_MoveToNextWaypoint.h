@@ -39,6 +39,10 @@ class WAYPOINTS_API UBTTask_MoveToNextWaypoint : public UBTTask_BlackboardBase
 {
 	GENERATED_UCLASS_BODY()
 
+	// If true, then the current waypoint will be set to the next waypoint after this task is finished.
+	UPROPERTY(Category = Node, EditAnywhere)
+	uint32 bSetNextWaypointAfterFinishing : 1;
+
 	UPROPERTY(Category = Node, EditAnywhere)
 	uint32 bWaitAtCheckpoint : 1;
 
