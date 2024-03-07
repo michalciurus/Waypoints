@@ -6,7 +6,7 @@ public class WaypointsEditorExtension : ModuleRules
 {
     public WaypointsEditorExtension(ReadOnlyTargetRules Target) : base(Target)
     {
-        bEnforceIWYU = true;
+        IWYUSupport = IWYUSupport.None;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(
@@ -26,7 +26,9 @@ public class WaypointsEditorExtension : ModuleRules
                 "Slate",
                 "SlateCore",
                 "LevelEditor",
-                "Waypoints"
+                "Waypoints",
+                "PluginUtils",
+                "Projects"
 			}
         );
     }

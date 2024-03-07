@@ -9,14 +9,17 @@
 #include "Waypoint.generated.h"
 
 class AWaypointLoop;
+class ANavigationData;
 
-UCLASS()
+UCLASS(Blueprintable, BlueprintType, meta=(PrioritizeCategories="Waypoint"))
 class WAYPOINTS_API AWaypoint : public AActor
 {
 	GENERATED_UCLASS_BODY()
 
+public:
 	virtual void PostRegisterAllComponents() override;
 #if WITH_EDITOR
+	virtual void PreEditChange(FProperty* PropertyThatWillChange) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void PostEditMove(bool bFinished) override;
 	virtual bool CanDeleteSelectedActor(FText& OutReason) const override { return true; };
@@ -47,27 +50,32 @@ class WAYPOINTS_API AWaypoint : public AActor
 
 	void CalculateSpline();
 
-protected:
-	UPROPERTY()
-		TWeakObjectPtr<AWaypoint> WaypointCopiedFrom;
+	void RecalculateIndex();
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Waypoint|Components", meta = (AllowPrivateAccess = "true"))
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Waypoint")
+		int32 WaypointIndex;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Waypointz")
 		class USceneComponent* Scene;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Waypoint|Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Waypoint")
 		class USphereComponent* OverlapSphere;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Waypoint|Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Waypoint")
 		class UBillboardComponent* Sprite;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Waypoint|Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Waypoint")
 		class USplineComponent* PathComponent;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Waypoint|Components", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Waypoint")
 		class UArrowComponent* GuardFacingArrow;
 
 	UPROPERTY(EditInstanceOnly, Category="Waypoint")
 		TWeakObjectPtr<AWaypointLoop> OwningLoop;
+
+	const ANavigationData* GetNavData() const;
+	const FNavAgentProperties& GetNavAgentProperties() const;
 
 protected:
 	UFUNCTION(CallInEditor)
@@ -79,7 +87,10 @@ protected:
 	UFUNCTION(CallInEditor, Category = "Waypoint")
 		void CreateWaypointLoop();
 
-	UPROPERTY(EditDefaultsOnly, Category = "Default")
+	UPROPERTY(EditAnywhere, Category = "Waypoint")
+		bool bUseCharacterClassNavProperties;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Waypoint", Meta=(EditCondition="!bUseCharacterClassNavProperties"))
 		FNavAgentProperties NavProperties;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Waypoint", meta = (ClampMin = "0.0", UIMin = "0.0"))
@@ -93,4 +104,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Waypoint", meta = (ClampMin = "-1.0", UIMin = "-1.0"))
 		float AcceptanceRadius;
+
+	// Character class used for navigation data
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Waypoint")
+		TSubclassOf<ACharacter> CharacterClass;
+
+	void SetWaypointLoop(AWaypointLoop* Loop);
 };

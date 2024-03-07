@@ -13,6 +13,8 @@
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "ClassIconFinder.h"
 #include "LevelEditor.h"
+#include "PluginUtils.h"
+#include "Interfaces/IPluginManager.h"
 
 #define IMAGE_BRUSH(RelativePath, ...) FSlateImageBrush(StyleSet->RootToContentDir(RelativePath, TEXT(".png")), __VA_ARGS__)
 
@@ -50,9 +52,7 @@ void FWaypointsEditorExtensionModule_Impl::StartupModule()
 	{
 		StyleSet = MakeShareable(new FSlateStyleSet("WaypointsPluginStyleSet"));
 
-		const FString SlateDirectory = FPaths::ProjectPluginsDir() / TEXT("Waypoints/Content/Slate");
-
-		//UE_LOG(LogTemp, Warning, TEXT("%s"), *SlateDirectory);
+		static const FString SlateDirectory = IPluginManager::Get().FindPlugin(TEXT("Waypoints"))->GetBaseDir() / "Resources/Slate";
 
 		StyleSet->SetContentRoot(SlateDirectory);
 		StyleSet->SetCoreContentRoot(SlateDirectory);

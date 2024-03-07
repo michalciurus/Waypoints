@@ -6,7 +6,7 @@ public class Waypoints : ModuleRules
 {
     public Waypoints(ReadOnlyTargetRules Target) : base(Target)
     {
-        bEnforceIWYU = true;
+        IWYUSupport = IWYUSupport.None;
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         PublicDependencyModuleNames.AddRange(

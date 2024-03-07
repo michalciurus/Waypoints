@@ -4,6 +4,7 @@
 #include "WaypointLoop.h"
 #include "Waypoint.h"
 #include "Components/SceneComponent.h"
+#include "Internationalization/TextLocalizationResource.h"
 
 // Sets default values
 AWaypointLoop::AWaypointLoop(const FObjectInitializer& ObjectInitializer)
@@ -11,6 +12,7 @@ AWaypointLoop::AWaypointLoop(const FObjectInitializer& ObjectInitializer)
 {
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SetRootComponent(Scene);
+	bSplineColorSetup = false;
 }
 
 #if WITH_EDITOR
@@ -19,6 +21,7 @@ void AWaypointLoop::PostEditChangeProperty(FPropertyChangedEvent& Event)
 	Super::PostEditChangeProperty(Event);
 
 	static const FName NAME_Waypoints = GET_MEMBER_NAME_CHECKED(AWaypointLoop, Waypoints);
+	static const FName NAME_SplineColor = GET_MEMBER_NAME_CHECKED(AWaypointLoop, SplineColor);
 
 	if (Event.Property)
 	{
@@ -26,12 +29,29 @@ void AWaypointLoop::PostEditChangeProperty(FPropertyChangedEvent& Event)
 
 		if (ChangedPropName == NAME_Waypoints)
 		{
-			for (TWeakObjectPtr<AWaypoint>& Waypoint : Waypoints)
-			{
-				Waypoint->CalculateSpline();
-			}
+			RecalculateAllWaypoints();
+		}
+
+		if (ChangedPropName == NAME_SplineColor)
+		{
+			bSplineColorSetup = true;
+			RecalculateAllWaypoints();
 		}
 	}
+}
+
+void AWaypointLoop::PostLoad()
+{
+	Super::PostLoad();
+
+	if (!bSplineColorSetup)
+	{
+		FRandomStream Stream(FTextLocalizationResource::HashString(GetName(), 0));
+		SplineColor = FLinearColor::MakeFromHSV8((uint8)(Stream.GetUnsignedInt() % 256), 255, 255);
+		bSplineColorSetup = true;
+	}
+
+	RecalculateAllWaypoints();
 }
 #endif // WITH_EDITOR
 
@@ -41,7 +61,7 @@ void AWaypointLoop::AddWaypoint(AWaypoint* NewWaypoint)
 
 	Waypoints.Push(TWeakObjectPtr<AWaypoint>(NewWaypoint));
 
-	// TODO: Update other waypoints when this happens
+	RecalculateAllWaypoints();
 }
 
 void AWaypointLoop::InsertWaypoint(AWaypoint* NewWaypoint, int32 Index)
@@ -49,6 +69,8 @@ void AWaypointLoop::InsertWaypoint(AWaypoint* NewWaypoint, int32 Index)
 	check(!Waypoints.Contains(TWeakObjectPtr<AWaypoint>(NewWaypoint)));
 
 	Waypoints.Insert(NewWaypoint, Index);
+
+	RecalculateAllWaypoints();
 }
 
 void AWaypointLoop::RemoveWaypoint(const AWaypoint* Waypoint)
@@ -81,8 +103,10 @@ void AWaypointLoop::RemoveWaypoint(const AWaypoint* Waypoint)
 	{
 		Destroy();
 	}
-
-	// TODO: Update other waypoints when this happens
+	else
+	{
+		RecalculateAllWaypoints();
+	}
 }
 
 int32 AWaypointLoop::FindWaypoint(const AWaypoint* Elem) const
@@ -96,4 +120,25 @@ int32 AWaypointLoop::FindWaypoint(const AWaypoint* Elem) const
 	}
 	
 	return INDEX_NONE;
+}
+
+void AWaypointLoop::RecalculateAllWaypoints()
+{
+	// Recalculate all indicies
+	for (int32 i = Waypoints.Num() - 1; i >= 0; --i)
+	{
+		if (Waypoints[i].IsValid())
+		{
+			Waypoints[i]->RecalculateIndex();
+		}
+	}
+
+	// Recalculate splines
+	for (int32 i = Waypoints.Num() - 1; i >= 0; --i)
+	{
+		if (Waypoints[i].IsValid())
+		{
+			Waypoints[i]->CalculateSpline();
+		}
+	}
 }

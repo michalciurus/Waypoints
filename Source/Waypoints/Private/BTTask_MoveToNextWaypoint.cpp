@@ -18,11 +18,9 @@
 UBTTask_MoveToNextWaypoint::UBTTask_MoveToNextWaypoint(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	NodeName = "Move To Next Waypoint";
-	bUseGameplayTasks = GET_AI_CONFIG_VAR(bEnableBTAITasks);
+	bUseGameplayTasks = true; //GET_AI_CONFIG_VAR(bEnableBTAITasks); deprecated in 5.2, always true now
 	bNotifyTick = !bUseGameplayTasks;
 	bNotifyTaskFinished = true;
-
-	AcceptanceRadius = 32.f;
 
 	bReachTestIncludesGoalRadius = bReachTestIncludesAgentRadius = GET_AI_CONFIG_VAR(bFinishMoveOnGoalOverlap);
 	//bAllowStrafe = GET_AI_CONFIG_VAR(bAllowStrafing);
@@ -77,7 +75,7 @@ EBTNodeResult::Type UBTTask_MoveToNextWaypoint::PerformMoveTask(UBehaviorTreeCom
 			AWaypoint* TargetActor = Cast<AWaypoint>(KeyValue);
 			if (TargetActor)
 			{
-				MoveReq.SetAcceptanceRadius(AcceptanceRadius);
+				MoveReq.SetAcceptanceRadius(TargetActor->GetAcceptanceRadius());
 				MoveReq.SetReachTestIncludesAgentRadius(bReachTestIncludesAgentRadius);
 				MoveReq.SetReachTestIncludesGoalRadius(bReachTestIncludesGoalRadius);
 				MoveReq.SetGoalActor(TargetActor);
@@ -90,7 +88,7 @@ EBTNodeResult::Type UBTTask_MoveToNextWaypoint::PerformMoveTask(UBehaviorTreeCom
 
 		if (MoveReq.IsValid())
 		{
-			if (GET_AI_CONFIG_VAR(bEnableBTAITasks))
+			if (true) //GET_AI_CONFIG_VAR(bEnableBTAITasks) deprecated in 5.2, always true now
 			{
 				UAITask_MoveTo* MoveTask = MyMemory->Task.Get();
 				const bool bReuseExistingTask = (MoveTask != nullptr);
@@ -195,16 +193,16 @@ void UBTTask_MoveToNextWaypoint::OnTaskFinished(UBehaviorTreeComponent& OwnerCom
 	MyMemory->Task.Reset();
 
 	// Set the blackboard value to the next waypoint
-	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
-	{
-		UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
-		UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-		AWaypoint* TargetActor = Cast<AWaypoint>(KeyValue);
-		if (TargetActor)
-		{
-			MyBlackboard->SetValueAsObject(BlackboardKey.SelectedKeyName, TargetActor->GetNextWaypoint());
-		}
-	}
+	//if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
+	//{
+	//	UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
+	//	UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
+	//	AWaypoint* TargetActor = Cast<AWaypoint>(KeyValue);
+	//	if (TargetActor)
+	//	{
+	//		MyBlackboard->SetValueAsObject(BlackboardKey.SelectedKeyName, TargetActor->GetNextWaypoint());
+	//	}
+	//}
 
 	// Reset the AI's focus
 	if (AAIController* MyController = OwnerComp.GetAIOwner())
