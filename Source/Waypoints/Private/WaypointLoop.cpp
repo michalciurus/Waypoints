@@ -20,6 +20,10 @@ void AWaypointLoop::PostEditChangeProperty(FPropertyChangedEvent& Event)
 {
 	Super::PostEditChangeProperty(Event);
 
+
+	// pupsko
+	// duże pupsko
+
 	static const FName NAME_Waypoints = GET_MEMBER_NAME_CHECKED(AWaypointLoop, Waypoints);
 	static const FName NAME_SplineColor = GET_MEMBER_NAME_CHECKED(AWaypointLoop, SplineColor);
 
