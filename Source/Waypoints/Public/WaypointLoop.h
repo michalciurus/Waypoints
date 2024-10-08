@@ -31,6 +31,7 @@ class WAYPOINTS_API AWaypointLoop : public AActor
 	void InsertWaypoint(AWaypoint* NewWaypoint, int32 Index);
 	void RemoveWaypoint(const AWaypoint* Waypoint);
 	int32 FindWaypoint(const AWaypoint* Elem) const;
+	AWaypoint* GetClosestWaypoint(const FVector& Location);
 
 	void RecalculateAllWaypoints();
 

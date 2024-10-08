@@ -126,6 +126,27 @@ int32 AWaypointLoop::FindWaypoint(const AWaypoint* Elem) const
 	return INDEX_NONE;
 }
 
+AWaypoint* AWaypointLoop::GetClosestWaypoint(const FVector& Location)
+{
+	float MinDistance = TNumericLimits<float>::Max();
+	AWaypoint* ClosestWaypoint = nullptr;
+
+	for (int32 i = 0; i < Waypoints.Num(); ++i)
+	{
+		if (Waypoints[i].IsValid())
+		{
+			float Distance = FVector::DistSquared(Waypoints[i]->GetActorLocation(), Location);
+			if (Distance < MinDistance)
+			{
+				MinDistance = Distance;
+				ClosestWaypoint = Waypoints[i].Get();
+			}
+		}
+	}
+
+	return ClosestWaypoint;
+}
+
 void AWaypointLoop::RecalculateAllWaypoints()
 {
 	// Recalculate all indicies
