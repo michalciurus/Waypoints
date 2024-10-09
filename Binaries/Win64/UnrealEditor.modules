@@ -1,0 +1,8 @@
+{
+	"BuildId": "33043543",
+	"Modules": 
+	{
+		"Waypoints": "UnrealEditor-Waypoints.dll",
+		"WaypointsEditorExtension": "UnrealEditor-WaypointsEditorExtension.dll"
+	}
+}
