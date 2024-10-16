@@ -29,6 +29,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Waypoint")
 		AWaypoint* GetNextWaypoint() const;
+	
+	UPROPERTY(EditInstanceOnly, Category="Waypoint")
+	TWeakObjectPtr<AWaypointLoop> OwningLoop;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Waypoint")
 		AWaypoint* GetPreviousWaypoint() const;
@@ -71,8 +74,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Waypoint")
 		class UArrowComponent* GuardFacingArrow;
 
-	UPROPERTY(EditInstanceOnly, Category="Waypoint")
-		TWeakObjectPtr<AWaypointLoop> OwningLoop;
 
 	const ANavigationData* GetNavData() const;
 	const FNavAgentProperties& GetNavAgentProperties() const;
