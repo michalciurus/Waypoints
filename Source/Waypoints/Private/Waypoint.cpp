@@ -241,7 +241,7 @@ void AWaypoint::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 
 	if (OwningLoop.IsValid() && OwningLoop->Waypoints.IsValidIndex(WaypointIndex))
 	{
-		OwningLoop->InsertWaypoint(this, WaypointIndex + 1);
+		//OwningLoop->InsertWaypoint(this, WaypointIndex + 1);
 		RecalculateIndex();
 	}
 #endif
